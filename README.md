@@ -1,16 +1,42 @@
-## v4l2loopback packaging instructions for Fedora
+# v4l2loopback Fedora packaging
 
-<a href="https://copr.fedorainfracloud.org/coprs/kuya-carlo/v4l2loopback/package/v4l2loopback/"><img src="https://copr.fedorainfracloud.org/coprs/kuya-carlo/v4l2loopback/package/v4l2loopback/status_image/last_build.png" /></a>
+Fedora packaging for the upstream [`v4l2loopback`](https://github.com/v4l2loopback/v4l2loopback) virtual Video4Linux loopback device tools and DKMS module.
 
-Packager: Daniel Miranda <danielkza2@gmail.com>
-Author: IOhannes m zmölnig <zmoelnig@iem.at> and others
+This is a packaging repository. Do **not** run install, DKMS registration, or module-loading commands as part of repository verification on a workstation; those actions can touch host kernel/module state.
 
-Upstream homepage: https://github.com/v4l2loopback/v4l2loopback
-Packaging repository: https://github.com/danielkza/v4l2loopback-fedora
-COPR repository: https://copr.fedorainfracloud.org/coprs/danielkza/v4l2loopback
+## Contents
 
-This repository contains instructions (a spec file) for packaging v4l2loopback
-for Fedora. It was tested with Fedora 22 to 24.
+- `v4l2loopback.spec` — RPM spec for the userspace utilities and `v4l2loopback-dkms` subpackage.
+- `build.sh` — helper that fetches sources, builds an SRPM with Mock, then either rebuilds locally or submits to COPR when a COPR name is supplied.
 
-The easiest way to build a clean and working binary package is to use Mock.
-Instructions can be found on the [Fedora Wiki on Mock](https://fedoraproject.org/wiki/Using_Mock_to_test_package_builds).
+## Safe local checks
+
+These checks validate packaging metadata without installing a driver or touching running services:
+
+```sh
+rpmspec -q --srpm v4l2loopback.spec
+rpmspec -q --requires v4l2loopback.spec
+bash -n build.sh
+```
+
+A full RPM build requires Fedora packaging tools (`spectool`, `mock`, `rpmspec`) and a configured Mock environment. Run it only when you intentionally want a local package build:
+
+```sh
+./build.sh
+```
+
+To submit the built SRPM to COPR, pass the COPR project name. This performs a remote build submission and is intentionally not part of safe local finalization:
+
+```sh
+./build.sh <copr-project-name>
+```
+
+## Current package target
+
+- Upstream source: `v4l2loopback`
+- Spec version: `0.15.3`
+- Package split: main userspace tools plus `v4l2loopback-dkms` for module source/DKMS registration
+
+## License
+
+The packaging repo carries the upstream GPLv2 license in [`LICENSE`](LICENSE).
